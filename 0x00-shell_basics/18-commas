@@ -1,3 +1,2 @@
-!/bin/bash
-ls -vamp
-
+#!/bin/bash
+ls -map
