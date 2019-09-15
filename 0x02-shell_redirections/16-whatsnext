@@ -1,2 +1,2 @@
 #!/bin/bash
-grep ^[[:alpha:]]  /etc/ssh/sshd_config
+cat /etc/passwd | grep -A 3 "root"
