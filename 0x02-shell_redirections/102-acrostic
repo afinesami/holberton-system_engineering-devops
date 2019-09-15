@@ -1,0 +1,2 @@
+#!/bin/bash
+echo -ne $(cut -c-1 | tr -d '\n')'\n'
