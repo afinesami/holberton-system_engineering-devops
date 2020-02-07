@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+#  Script bash displays the content for current directory
+content=0
+list=$(ls)
+for content in $list
+do
+    echo "$content" | cut -d "-" -f2
+done
