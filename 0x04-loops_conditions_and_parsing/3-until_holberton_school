@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+# displays until loop Holberton School 10 times
+COUNT=0
+until [ "$COUNT" -eq 10 ]; do
+      echo "Holberton School"
+      let COUNT=COUNT+1
+done
