@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+# "bad luck from China" 4th iteration
+# "bad luck from Japan" 9th iteration
+# "bad luck from Italy" 17th iteration
+
+Counter=1
+while [ "$Counter" -le 20 ];
+    do
+    echo "$Counter"
+    case "$Counter" in
+4)
+    echo "bad luck from China"
+    ;;
+9)
+    echo "bad luck from Japan"
+    ;;
+17)
+    echo "bad luck from Italy"
+    ;;
+    esac
+    let Counter=Counter+1
+done
