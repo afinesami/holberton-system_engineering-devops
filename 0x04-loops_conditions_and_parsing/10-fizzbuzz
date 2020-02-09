@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #  Script bach FizzBuzz
-cont=1
+conter=1
 while [ $conter -le 100 ];
 do
 if [ $((conter%3)) == 0 -a $((conter%5)) == 0 ]
