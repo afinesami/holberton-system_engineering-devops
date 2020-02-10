@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+#Script bash that displays a list of currently running processes
+ps -auxf
