@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+# create a pair of ssh where betty is the pswd
+# 4096 the bits to create
+
+ssh-keygen -f holberton -b 4096 -N betty
