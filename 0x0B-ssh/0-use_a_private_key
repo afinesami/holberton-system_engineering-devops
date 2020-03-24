@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+# the server is the number we use ubuntu and ssh
+ssh -i ~/.ssh/holberton ubuntu@35.231.116.248
