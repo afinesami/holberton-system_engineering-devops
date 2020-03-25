@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Client configuration file
 # file with user config
-Host 35.231.116.248
+Host 34.73.24.78
 IdentityFile ~/.ssh/holberton
 PasswordAuthentication no
