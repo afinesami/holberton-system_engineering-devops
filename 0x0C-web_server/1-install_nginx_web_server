@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+#install ngix and put holberton inside
+sudo apt-get -y update
+sudo apt-get -y install nginx
+echo "Holberton School" | sudo tee /var/www/html/index.html
+sudo service nginx start
