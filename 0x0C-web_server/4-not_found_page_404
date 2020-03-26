@@ -1,9 +1,14 @@
 #!/usr/bin/env bash
-#install ngix and put holberton inside
-redir="\\\tlocation /redirect_me {\n\t\t return 301 https://www.youtube.com/watch?v=QH2-TGUlwu4;\n\t}\n"
-
-sudo apt-get update
-sudo apt-get install nginx -y
-echo "Holberton School" | sudo tee /usr/share/nginx/html/index.html
-sudo sed -i "30i $redir" /etc/nginx/sites-available/default
-sudo service nginx start
+# Configure Nginx server to give error 404 page
+apt-get -y update
+apt-get -y install nginx
+# 1 Return a page Holberton School
+echo "Holberton School" | tee /var/www/html/index.html
+# 2 redirection page
+TEXT="location /redirect_me {\\n return 301 https://www.youtube.com/watch?v=QH2-TGUlwu4;\\n}\\n"
+sudo sed -i "42i $TEXT" /etc/nginx/sites-available/default
+# 3 HTTP 404 error page inclu Ceci n'est pas une page
+echo "Ceci n'est pas une page" | tee /var/www/html/404.html
+CUSTOM="error_page 404 /404.html;\nlocation = /404.html {\nroot /var/www/html;\ninternal;\n}"
+sudo sed -i "/server_name _;/a $CUSTOM" /etc/nginx/sites-available/default
+service nginx restart
