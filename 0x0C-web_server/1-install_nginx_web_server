@@ -1,8 +1,33 @@
 #!/usr/bin/env bash
 #install ngix and put holberton inside
-sudo apt-get -y update
-sudo apt-get -y install nginx
-# Nginx should be listening on port 80
-#  it must return a page contains Holberton School
-sudo echo "Holberton School" | tee /var/www/html/index.html
-sudo service nginx start
+
+sudo apt-get update -y && \
+sudo apt-get install -y nginx
+if [ $? -eq 0 ]
+then
+    echo -e \
+"http {
+    root /var/www/holberton;
+    index index.html;
+    server {
+        listen 80;
+        location \ {
+        }
+    }
+}
+events {
+}" > /etc/nginx/nginx.conf
+    mkdir -p /var/www/holberton
+    echo "hello Holberton School" > \
+	/var/www/holberton/index.html
+    service nginx start
+    if [ $? -ne 0 ]
+    then
+	"Problem starting nginx"
+	exit 1
+    fi
+else
+    echo "Could not install nginx"
+    exit 1
+fi
+exit 0
