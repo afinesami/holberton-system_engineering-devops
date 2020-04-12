@@ -1,0 +1,77 @@
+global
+	log /dev/log	local0
+	log /dev/log	local1 notice
+	chroot /var/lib/haproxy
+	stats socket /run/haproxy/admin.sock mode 660 level admin
+	stats timeout 30s
+	user haproxy
+	group haproxy
+	daemon
+	maxconn 2048
+	tune.ssl.default-dh-param 2048
+
+	# Default SSL material locations
+	ca-base /etc/ssl/certs
+	crt-base /etc/ssl/private
+
+	# Default ciphers to use on SSL-enabled listening sockets.
+	# For more information, see ciphers(1SSL). This list is from:
+	#  https://hynek.me/articles/hardening-your-web-servers-ssl-ciphers/
+	ssl-default-bind-ciphers ECDH+AESGCM:DH+AESGCM:ECDH+AES256:DH+AES256:ECDH+AES128:DH+AES:ECDH+3DES:DH+3DES:RSA+AESGCM:RSA+AES:RSA+3DES:!aNULL:!MD5:!DSS
+	ssl-default-bind-options no-sslv3
+
+defaults
+	log	global
+	mode	http
+	option	httplog
+	option	dontlognull
+        timeout connect 5000
+        timeout client  50000
+        timeout server  50000
+	errorfile 400 /etc/haproxy/errors/400.http
+	errorfile 403 /etc/haproxy/errors/403.http
+	errorfile 408 /etc/haproxy/errors/408.http
+	errorfile 500 /etc/haproxy/errors/500.http
+	errorfile 502 /etc/haproxy/errors/502.http
+	errorfile 503 /etc/haproxy/errors/503.http
+	errorfile 504 /etc/haproxy/errors/504.http
+	option forwardfor
+    option http-server-close
+
+listen backend *:80
+    mode http
+    stats enable
+    stats uri /haproxy?stats
+    balance roundrobin
+    server 1123-web-01 35.231.60.179:80 check
+    server 1123-web-02 34.228.186.160:80 check
+
+frontend localhost
+    bind *:80
+    bind *:443 ssl crt /etc/ssl/xip.io/xip.io.pem
+    mode http
+    default_backend nodes
+
+frontend localnodes
+    bind *:80
+    mode http
+    default_backend nodes
+
+backend nodes
+    mode http
+    balance roundrobin
+    option forwardfor
+    option httpchk HEAD / HTTP/1.1\r\nHost:localhost
+    server 1123-web-01 35.231.60.179:80 check
+    server 1123-web-02 34.228.186.160:80 check
+    http-request set-header X-Forwarded-Port %[dst_port]
+    http-request add-header X-Forwarded-Proto https if { ssl_fc  }
+
+listen 1091-lb-01
+	bind *:80
+	mode http
+	balance roundrobin
+	option httpclose
+	option forwardfor
+	server 1123-web-01 35.231.60.179:80 check
+	server 1123-web-02 34.228.186.160:80 check
