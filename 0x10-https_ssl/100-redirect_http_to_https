@@ -37,11 +37,12 @@ defaults
 	errorfile 503 /etc/haproxy/errors/503.http
 	errorfile 504 /etc/haproxy/errors/504.http
 
-frontend haproxynode
-	bind *:80
-	mode http
-	redirect scheme https code 301 if !{ ssl_fc }
-	default_backend backendnodes
+
+frontend www-http
+   	  bind *:80
+   	   reqadd X-Forwarded-Proto:\ http
+   	    default_backend www-backend
+	     redirect scheme https code 301 if !{ ssl_fc }
 
 
 frontend www-https
@@ -55,3 +56,7 @@ backend backendnodes
 	redirect scheme https if !{ ssl_fc }
 	server 1124-web-01 34.74.72.68:80 check
 	server 1124-web-02 54.196.204.208:80 check
+
+
+backend letsencrypt-backend
+   	server letsencrypt 127.0.0.1:54321
