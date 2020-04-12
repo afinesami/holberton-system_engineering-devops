@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+#Configure your domain zone so that the subdomain
+s=("www" "lb-01" "web-01" "web-02")
+dig_ias ()
+{
+    dig "$2.$1" | awk '/ANSWER SECTION:/{getline; printf "The subdomain %s is a %s record and points to %s\n", var, $4, $5}' var="$2"
+}
+
+for subdomain in "${s[@]}"
+do
+    if [ -z "$2" ] || [ "$2" == "$subdomain" ] ;
+    then
+	dig_ias "$1" "$subdomain"
+    fi
+done
