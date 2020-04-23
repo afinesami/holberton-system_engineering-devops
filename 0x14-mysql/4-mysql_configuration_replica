@@ -108,22 +108,3 @@ relay-log		= /var/log/mysql/mysql-relay-bin.log
 # ssl-ca=/etc/mysql/cacert.pem
 # ssl-cert=/etc/mysql/server-cert.pem
 # ssl-key=/etc/mysql/server-key.pem
-
-
-
-[mysqldump]
-quick
-quote-names
-max_allowed_packet	= 16M
-
-[mysql]
-#no-auto-rehash	# faster start of mysql but no tab completition
-
-[isamchk]
-key_buffer		= 16M
-
-#
-# * IMPORTANT: Additional settings that can override those from this file!
-#   The files must end with '.cnf', otherwise they'll be ignored.
-#
-!includedir /etc/mysql/conf.d/
