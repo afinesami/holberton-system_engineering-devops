@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-''' module to print data from an api '''
+# Gather data from an api
 import requests
 import sys
 
