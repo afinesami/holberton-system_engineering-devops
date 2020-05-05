@@ -1,6 +1,8 @@
 #!/usr/bin/python3
 # module to print data from an api
-import requests
+import urllib.request
+import csv
+import json
 import sys
 
 
