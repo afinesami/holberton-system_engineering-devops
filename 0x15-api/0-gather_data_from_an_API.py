@@ -2,8 +2,7 @@
 # Gather data from an api
 
 import requests
-import sys
-import argv
+from sys import argv
 
 
 if __name__ == '__main__':
