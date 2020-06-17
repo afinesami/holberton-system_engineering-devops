@@ -1,35 +1,22 @@
 #!/usr/bin/python3
-# module to print data from an api
-import urllib.request
+'''
+export data in the CSV format
+'''
+
 import csv
-import json
-import sys
+import requests
+from sys import argv
 
-
-if __name__ == "__main__":
-    numbertask = 0
-    taskcomplete = 0
-    tasksdone = []
-    userid = sys.argv[1]
-    url1 = 'https://jsonplaceholder.typicode.com/todos'
-    with urllib.request.urlopen(url1) as response:
-        html = response.read()
-    dattod = json.loads(html.decode('utf-8'))
-    with urllib.request.urlopen('https://jsonplaceholder.typicode.com/users/' +
-                                sys.argv[1]) as response:
-        html = response.read()
-    datuser = json.loads(html.decode('utf-8'))
-    for item in dattod:
-        if int(item['userId']) == int(userid):
-            tasksdone.append(item)
-    file1 = "{}.csv".format(userid)
-    with open(file1, mode='w') as emplo_file:
-        employee_writer = csv.writer(
-            emplo_file,
-            delimiter=',',
-            quotechar='"',
-            quoting=csv.QUOTE_NONNUMERIC)
-        for taks in tasksdone:
-            employee_writer.writerow([str(datuser['id']),
-                                      datuser['username'],
-                                      str(taks['completed']), taks['title']])
+if __name__ == '__main__':
+    uid = argv[1]
+    url = "https://jsonplaceholder.typicode.com/users/{}".format(uid)
+    user = requests.get(url, verify=False).json()
+    url = "https://jsonplaceholder.typicode.com/todos?userId={}".format(
+        uid)
+    todo = requests.get(url, verify=False).json()
+    with open("{}.csv".format(uid), 'w', newline='') as csvfile:
+        taskwriter = csv.writer(csvfile, quoting=csv.QUOTE_ALL)
+        for t in todo:
+            taskwriter.writerow([int(uid), user.get('username'),
+                                 t.get('completed'),
+                                 t.get('title')])
