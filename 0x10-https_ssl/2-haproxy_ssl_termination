@@ -1,14 +1,15 @@
 global
-	log /dev/log    local0
-	log /dev/log    local1 notice
+	log /dev/log	local0
+	log /dev/log	local1 notice
 	chroot /var/lib/haproxy
-	stats socket /run/haproxy/admin.sock mode 660 level admin
+	stats socket /run/haproxy/admin.sock mode 660 level admin expose-fd listeners
 	stats timeout 30s
 	user haproxy
 	group haproxy
 	daemon
-
-
+	# ssl configuration
+	maxconn 2048
+	tune.ssl.default-dh-param 2048
 	# Default SSL material locations
 	ca-base /etc/ssl/certs
 	crt-base /etc/ssl/private
@@ -16,18 +17,19 @@ global
 	# Default ciphers to use on SSL-enabled listening sockets.
 	# For more information, see ciphers(1SSL). This list is from:
 	#  https://hynek.me/articles/hardening-your-web-servers-ssl-ciphers/
-	ssl-default-bind-ciphers ECDH+AESGCM:DH+AESGCM:ECDH+AES256::RSA+AES:RSA+3DES:!aNULL:!MD5:!DSS
+	# An alternative list with additional directives can be obtained from
+	#  https://mozilla.github.io/server-side-tls/ssl-config-generator/?server=haproxy
+	ssl-default-bind-ciphers ECDH+AESGCM:DH+AESGCM:ECDH+AES256:DH+AES256:ECDH+AES128:DH+AES:RSA+AESGCM:RSA+AES:!aNULL:!MD5:!DSS
 	ssl-default-bind-options no-sslv3
 
 defaults
-	log     global
-	mode    http
-	option  httplog
-	option  dontlognull
-	timeout connect 5000
-	timeout client  50000
-	timeout server  50000
-	option forwardfor
+	log	global
+	mode	http
+	option	httplog
+	option	dontlognull
+        timeout connect 5000
+        timeout client  50000
+        timeout server  50000
 	errorfile 400 /etc/haproxy/errors/400.http
 	errorfile 403 /etc/haproxy/errors/403.http
 	errorfile 408 /etc/haproxy/errors/408.http
@@ -35,21 +37,34 @@ defaults
 	errorfile 502 /etc/haproxy/errors/502.http
 	errorfile 503 /etc/haproxy/errors/503.http
 	errorfile 504 /etc/haproxy/errors/504.http
-
-frontend haproxynode
+listen 1091-lb-01
 	bind *:80
 	mode http
-	default_backend backendnodes
+	balance roundrobin
+	option httpclose
+	option forwardfor
+	server 1091-web-01 35.237.235.204:80 check
+	server 1091-web-02 34.73.24.78:80 check
+   	option forwardfor
+   	option http-server-close
 
+# Configuration for SSL
+frontend www-http
+         bind *:80
+         reqadd X-Forwarded-Proto:\ http
+         default_backend www-backend
 
 frontend www-https
-	bind *:443 ssl crt /etc/ssl/xip.io/xip.io.pem
-	reqadd X-Forwarded-Proto:\ https
-	default_backend backendnodes
+         bind *:443 ssl crt /etc/haproxy/certs/www.redinium.tech.pem
+         reqadd X-Forwarded-Proto:\ https
+         acl letsencrypt-acl path_beg /.well-known/acme-challenge/
+         use_backend letsencrypt-backend if letsencrypt-acl
+         default_backend www-backend
 
+backend www-backend
+        redirect scheme https if !{ ssl_fc }
+        server 1091-web-01 34.74.141.15:80 check
+        server 1091-web-02 34.73.24.78:80 check
 
-backend backendnodes
-	balance roundrobin
-	redirect scheme https if !{ ssl_fc }
-	server 1124-web-01 34.74.72.68:80 check
-	server 1124-web-02 54.196.204.208:80 check
+backend letsencrypt-backend
+        server letsencrypt 127.0.0.1:54321
