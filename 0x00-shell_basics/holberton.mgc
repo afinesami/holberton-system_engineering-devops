@@ -1,2 +1,2 @@
-0 string HOLBERTON Holberton data
-!:mime Holberton
+0 string SCHOOL School data
+!:mime School
